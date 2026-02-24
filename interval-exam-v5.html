@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>מבחן שמיעה — מרווחים</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Hebrew:wght@300;400;600;700&family=Playfair+Display:ital@1&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Serif Hebrew',serif;background:var(--bg);color:var(--ink);direction:rtl;min-height:100vh;display:flex;flex-direction:column;-webkit-text-size-adjust:100%;font-size:15px;transition:background .4s,color .4s}
+
+/* ── PALETTES ── */
+:root{
+  --bg:#f0f4f8;--ink:#111827;--header:#1e3a5f;--accent:#1d60b5;--accent-l:#dbeafe;--accent-m:#93c5fd;
+  --teal:#0f766e;--green:#15803d;--red:#b91c1c;--purple:#7c3aed;--border:#d1d5db;--gray:#6b7280;
+  --card:#fff;--dot-done-ok:#166534;--dot-done-err:#991b1b;--dot-done-p:#1e40af;
+}
+.pal-blue   {--bg:#eff6ff;--header:#1e3a5f;--accent:#1d60b5;--accent-l:#dbeafe;--accent-m:#93c5fd;--teal:#0f766e;--card:#fff}
+.pal-green  {--bg:#f0fdf4;--header:#14532d;--accent:#166534;--accent-l:#dcfce7;--accent-m:#86efac;--teal:#15803d;--card:#fff}
+.pal-purple {--bg:#faf5ff;--header:#4c1d95;--accent:#7c3aed;--accent-l:#f3e8ff;--accent-m:#c4b5fd;--teal:#6d28d9;--card:#fff}
+.pal-red    {--bg:#fff1f2;--header:#881337;--accent:#be123c;--accent-l:#ffe4e6;--accent-m:#fda4af;--teal:#9f1239;--card:#fff}
+.pal-orange {--bg:#fff7ed;--header:#7c2d12;--accent:#c2410c;--accent-l:#ffedd5;--accent-m:#fdba74;--teal:#ea580c;--card:#fff}
+.pal-yellow {--bg:#fefce8;--header:#713f12;--accent:#a16207;--accent-l:#fef9c3;--accent-m:#fde047;--teal:#ca8a04;--card:#fff;--ink:#1c1917}
+.pal-cyan   {--bg:#ecfeff;--header:#164e63;--accent:#0e7490;--accent-l:#cffafe;--accent-m:#67e8f9;--teal:#0891b2;--card:#fff}
+.pal-dark   {--bg:#0f172a;--header:#1e293b;--accent:#3b82f6;--accent-l:#1e3a5f;--accent-m:#1d4ed8;--teal:#0891b2;--card:#1e293b;--ink:#e2e8f0;--border:#334155;--gray:#94a3b8}
+.pal-warm   {--bg:#fdf4ff;--header:#3b0764;--accent:#a855f7;--accent-l:#fae8ff;--accent-m:#d8b4fe;--teal:#9333ea;--card:#fff}
+
+/* TOP */
+.top-bar{background:var(--header);color:#fff;padding:10px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid var(--accent);flex-shrink:0;transition:background .4s,border-color .4s}
+.top-title{font-size:.95rem;font-weight:700}
+.top-sub{font-size:.72rem;color:var(--accent-m);margin-top:2px}
+.q-counter{background:#ffffff22;border-radius:20px;padding:3px 12px;font-size:.78rem;font-weight:700;color:#e0f2fe;white-space:nowrap}
+.progress-bar{height:5px;background:#334155;flex-shrink:0}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--teal));transition:width .4s,background .4s}
+
+/* MAIN */
+.main{flex:1;overflow-y:auto;padding:16px 14px 16px;max-width:700px;margin:0 auto;width:100%;display:flex;flex-direction:column;align-items:center;-webkit-overflow-scrolling:touch}
+
+/* BADGE */
+.badge{display:inline-flex;align-items:center;gap:6px;padding:4px 14px;border-radius:20px;font-size:.75rem;font-weight:700;margin-bottom:12px;border:1.5px solid var(--accent-m);background:var(--accent-l);color:var(--accent);transition:all .4s}
+
+/* CARD */
+.card{background:var(--card);border-radius:14px;box-shadow:0 2px 18px rgba(0,0,0,.1);padding:22px 20px;width:100%;text-align:center;position:relative;transition:background .4s,box-shadow .4s}
+
+/* PLAY */
+.play-big{width:84px;height:84px;border-radius:50%;background:var(--teal);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:2.2rem;color:#fff;margin:0 auto 5px;box-shadow:0 4px 18px rgba(0,0,0,.25);transition:all .15s;-webkit-tap-highlight-color:transparent}
+.play-big:hover{filter:brightness(1.1);transform:scale(1.05)}
+.play-big.playing{background:var(--red);animation:pulse .6s infinite alternate}
+@keyframes pulse{from{opacity:1}to{opacity:.6}}
+.play-hint{font-size:.72rem;color:var(--gray);margin-bottom:14px}
+.play-count{font-size:.7rem;color:var(--gray);margin-top:2px;min-height:1em}
+
+/* MC */
+.mc-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px}
+.mc-btn{padding:12px 9px;border:2px solid var(--border);border-radius:10px;background:var(--card);font-family:inherit;font-size:.85rem;font-weight:700;cursor:pointer;transition:all .12s;line-height:1.4;-webkit-tap-highlight-color:transparent;color:var(--ink)}
+.mc-btn:hover:not(:disabled){border-color:var(--accent);background:var(--accent-l)}
+.mc-btn.correct{border-color:var(--green)!important;background:#dcfce7!important;color:#166534!important}
+.mc-btn.wrong{border-color:var(--red)!important;background:#fee2e2!important;color:#991b1b!important}
+.mc-btn.partial{border-color:var(--accent)!important;background:var(--accent-l)!important;color:var(--accent)!important}
+
+/* PANELS */
+.panels-wrap{display:flex;flex-direction:column;gap:10px;margin-top:8px;width:100%}
+.panel-label{font-size:.7rem;font-weight:700;color:var(--gray);text-align:right;margin-bottom:4px}
+.panel-btns{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end}
+.panel-btn{padding:8px 13px;border:2px solid var(--border);border-radius:8px;background:var(--card);font-family:inherit;font-size:.85rem;font-weight:700;cursor:pointer;transition:all .12s;-webkit-tap-highlight-color:transparent;color:var(--ink)}
+.panel-btn:hover:not(:disabled){border-color:var(--accent);background:var(--accent-l)}
+.panel-btn.sel-q{border-color:var(--purple);background:#f3e8ff;color:var(--purple)}
+.panel-btn.sel-s{border-color:var(--accent);background:var(--accent-l);color:var(--accent)}
+.panel-btn.correct{border-color:var(--green)!important;background:#dcfce7!important;color:#166534!important}
+.panel-btn.wrong{border-color:var(--red)!important;background:#fee2e2!important;color:#991b1b!important}
+.panel-btn.partial{border-color:var(--accent)!important;background:var(--accent-l)!important;color:var(--accent)!important}
+.clear-btn{padding:5px 12px;border:1.5px solid var(--border);border-radius:6px;background:transparent;font-family:inherit;font-size:.75rem;color:var(--gray);cursor:pointer;transition:all .12s}
+.clear-btn:hover{border-color:var(--red);color:var(--red)}
+.sel-display{background:var(--accent-l);border:1.5px solid var(--accent-m);border-radius:8px;padding:9px 14px;font-size:.88rem;font-weight:700;text-align:center;min-height:40px;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .3s;color:var(--ink)}
+.sel-q{color:var(--purple)}.sel-s{color:var(--accent)}
+.submit-row{display:flex;justify-content:space-between;align-items:center;margin-top:10px;gap:8px}
+.submit-btn{padding:10px 28px;background:var(--header);color:#fff;border:none;border-radius:8px;font-family:inherit;font-size:.9rem;font-weight:700;cursor:pointer;transition:all .15s}
+.submit-btn:disabled{opacity:.4;cursor:default}
+
+/* FEEDBACK */
+.fb{border-radius:8px;padding:11px 15px;font-size:.85rem;line-height:1.65;text-align:right;display:none;margin-top:10px}
+.fb.ok{background:#dcfce7;color:#166534;border:2px solid #86efac;display:block}
+.fb.err{background:#fee2e2;color:#991b1b;border:2px solid #fca5a5;display:block}
+.fb.partial{background:var(--accent-l);color:var(--accent);border:2px solid var(--accent-m);display:block}
+.iv-chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:6px;justify-content:flex-end;align-items:center}
+.iv-chip{background:rgba(0,0,0,.08);border-radius:5px;padding:2px 9px;font-size:.8rem;font-weight:700;font-family:monospace;white-space:nowrap}
+.tone-chip{font-family:'Playfair Display',Georgia,serif;font-style:italic;font-size:.9rem;letter-spacing:.02em}
+
+/* STAFF */
+.staff-reveal{margin-top:12px;display:none;background:var(--card);border-radius:8px;border:1px solid var(--border);overflow:visible;padding:4px 0}
+.staff-reveal.show{display:block}
+.staff-svg{display:block;width:100%;height:auto}
+
+/* NEXT */
+.next-btn{padding:10px 40px;background:var(--teal);color:#fff;border:none;border-radius:8px;font-family:inherit;font-size:.9rem;font-weight:700;cursor:pointer;margin-top:12px;display:none;transition:all .15s}
+.next-btn.show{display:inline-block}
+
+/* FLAG BTN */
+.flag-btn{position:absolute;top:8px;left:8px;background:none;border:none;font-size:1rem;cursor:pointer;opacity:.45;transition:opacity .15s;padding:4px;-webkit-tap-highlight-color:transparent;line-height:1}
+.flag-btn:hover{opacity:1}
+.flag-btn.active{opacity:1}
+
+/* BOT NAV */
+.bot-bar{background:var(--header);border-top:2px solid var(--accent);padding:8px 10px 10px;position:sticky;bottom:0;flex-shrink:0;transition:background .4s,border-color .4s}
+.bot-inner{max-width:700px;margin:0 auto;display:flex;flex-direction:column;gap:5px}
+.bot-label{font-size:.63rem;color:var(--accent-m);text-align:center;letter-spacing:.04em}
+.nav-dots{display:flex;gap:4px;justify-content:center;flex-wrap:wrap;align-items:center}
+.ndot{position:relative;width:28px;height:28px;border-radius:6px;background:rgba(255,255,255,.1);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.66rem;font-weight:700;color:rgba(255,255,255,.55);transition:all .18s;border:2px solid transparent;flex-shrink:0;-webkit-tap-highlight-color:transparent}
+.ndot:hover{background:rgba(255,255,255,.2);color:#fff}
+.ndot.cur{background:var(--accent);color:#fff;border-color:var(--accent-m);transform:scale(1.12)}
+.ndot.done-ok{background:#166534;color:#fff}
+.ndot.done-err{background:#991b1b;color:#fff}
+.ndot.done-partial{background:#1e40af;color:#fff}
+.ndot.flagged{border-color:#f59e0b}
+.ndot.flagged::after{content:'🚩';position:absolute;top:-7px;right:-4px;font-size:.58rem}
+.section-divider{width:2px;height:22px;background:rgba(255,255,255,.2);flex-shrink:0;border-radius:1px;margin:0 2px}
+
+/* SCORE */
+.score-card{background:var(--card);border-radius:14px;padding:24px 20px;box-shadow:0 2px 18px rgba(0,0,0,.1);width:100%}
+.score-big{font-size:3.2rem;font-weight:700;color:var(--accent);line-height:1}
+.score-bar{height:9px;background:rgba(0,0,0,.1);border-radius:5px;overflow:hidden;margin:12px 0 4px}
+.score-fill{height:100%;border-radius:5px;background:linear-gradient(90deg,var(--accent),var(--teal));transition:width 1.2s ease}
+.analysis-section{margin-top:14px;text-align:right}
+.analysis-title{font-size:.8rem;font-weight:700;margin-bottom:6px}
+.tag{display:inline-block;border-radius:5px;padding:2px 8px;font-size:.73rem;font-weight:700;margin:2px}
+.tag-ok{background:#dcfce7;color:#166534}
+.tag-err{background:#fee2e2;color:#991b1b}
+.tag-warn{background:#fef3c7;color:#92400e}
+.analysis-table{width:100%;border-collapse:collapse;margin-top:10px;font-size:.79rem;text-align:right}
+.analysis-table th{background:var(--header);color:#fff;padding:6px 9px;font-weight:700}
+.analysis-table td{padding:6px 9px;border-bottom:1px solid var(--border);color:var(--ink)}
+.analysis-table tr:nth-child(even) td{background:var(--accent-l)}
+.pdf-btn{padding:10px 24px;background:var(--purple);color:#fff;border:none;border-radius:8px;font-family:inherit;font-size:.87rem;font-weight:700;cursor:pointer;margin-top:12px;display:flex;align-items:center;gap:7px;margin-left:auto;margin-right:auto}
+.restart-btn{padding:10px 32px;background:var(--header);color:#fff;border:none;border-radius:8px;font-family:inherit;font-size:.87rem;font-weight:700;cursor:pointer;margin-top:8px}
+.msg-box{border-radius:10px;padding:12px 16px;text-align:center;margin:10px 0;font-size:.87rem;font-weight:700;line-height:1.6}
+.msg-great{background:linear-gradient(135deg,#fef3c7,#dcfce7);border:2px solid #86efac;color:#166534}
+.msg-ok{background:linear-gradient(135deg,#eff6ff,#ecfdf5);border:2px solid #86efac;color:#166534}
+.msg-retry{background:var(--accent-l);border:2px solid var(--accent-m);color:var(--accent)}
+
+/* WATERMARK */
+.watermark{text-align:center;padding:10px 0 6px;font-size:.72rem;color:var(--gray);font-family:'Playfair Display',Georgia,serif;font-style:italic;opacity:.6;flex-shrink:0}
+.watermark span{letter-spacing:.06em}
+
+.name-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:40px 20px;width:100%;max-width:420px;text-align:center}
+.name-title{font-size:1.2rem;font-weight:700;color:var(--header)}
+.name-sub{font-size:.85rem;color:var(--gray)}
+.name-input{width:100%;padding:12px 16px;border:2px solid var(--accent-m);border-radius:10px;font-family:inherit;font-size:1rem;text-align:center;outline:none;transition:border .2s;background:var(--card);color:var(--ink)}
+.name-input:focus{border-color:var(--accent)}
+.name-start-btn{padding:12px 40px;background:var(--teal);color:#fff;border:none;border-radius:10px;font-family:inherit;font-size:1rem;font-weight:700;cursor:pointer;transition:all .15s}
+.name-start-btn:hover{filter:brightness(1.1)}
+
+@media print{
+  .top-bar,.progress-bar,.bot-bar,.pdf-btn,.restart-btn,.next-btn,.play-big,.play-hint,.play-count,.badge,.mc-grid,.panels-wrap,.submit-row,.clear-btn,.flag-btn,.watermark{display:none!important}
+  .score-card{box-shadow:none!important;border:1px solid #ccc!important}
+  body{background:#fff!important}
+  .print-header{display:block!important;font-size:13px;font-weight:700;margin-bottom:10px;text-align:center;color:#1e3a5f}
+  .staff-reveal.show{display:block!important}
+}
+.print-header{display:none}
+@media(max-width:480px){.mc-grid{grid-template-columns:1fr}.play-big{width:72px;height:72px;font-size:1.9rem}.ndot{width:24px;height:24px;font-size:.6rem}}
+</style>
+</head>
+<body class="pal-blue">
+<div class="top-bar">
+  <div><div class="top-title">מבחן שמיעה — מרווחים מוזיקליים</div>
+  <div class="top-sub">האזינו וזהו את המרווח</div></div>
+  <div style="display:flex;flex-direction:column;gap:5px;align-items:flex-end">
+    <div style="display:flex;gap:6px;align-items:center">
+      <label style="color:var(--accent-m);font-size:.7rem;white-space:nowrap">שם:</label>
+      <input id="student-name" type="text" placeholder="שם התלמיד/ה" style="padding:3px 8px;border-radius:6px;border:1px solid var(--accent-m);background:#ffffff22;color:#fff;font-family:inherit;font-size:.78rem;width:110px;text-align:right;outline:none" oninput="this.style.color='#fff'">
+      <label style="color:var(--accent-m);font-size:.7rem;white-space:nowrap">כיתה:</label>
+      <input id="student-class" type="text" placeholder="כיתה" style="padding:3px 8px;border-radius:6px;border:1px solid var(--accent-m);background:#ffffff22;color:#fff;font-family:inherit;font-size:.78rem;width:60px;text-align:right;outline:none">
+    </div>
+    <div class="q-counter" id="q-counter">שאלה 1 / 20</div>
+  </div>
+</div>
+<div class="progress-bar"><div class="progress-fill" id="prog"></div></div>
+<div class="main" id="main"></div>
+<div class="bot-bar">
+  <div class="bot-inner">
+    <div class="bot-label">לחצו לדלג · 🚩 לסמן לחזרה</div>
+    <div class="nav-dots" id="nav-dots"></div>
+  </div>
+</div>
+<div class="watermark"><span>Matan Margolin</span> · מבחן שמיעה</div>
+
+<script>
+'use strict';
+
+// ── PALETTES ──────────────────────────────────────────────────────────────
+const PALETTES=['pal-blue','pal-green','pal-purple','pal-red','pal-orange','pal-yellow','pal-cyan','pal-dark','pal-warm'];
+let curPalette=0;
+function applyPalette(i){
+  document.body.classList.remove(...PALETTES);
+  document.body.classList.add(PALETTES[i]);
+}
+
+// ── INTERVALS ─────────────────────────────────────────────────────────────
+const INTERVALS=[
+  {semi:0, quality:'זכה',    size:'פרימה',   name:'פרימה זכה',    weight:1},
+  {semi:1, quality:'קטנה',   size:'סקונדה',  name:'סקונדה קטנה',  weight:3},
+  {semi:2, quality:'גדולה',  size:'סקונדה',  name:'סקונדה גדולה', weight:3},
+  {semi:3, quality:'קטנה',   size:'טרצה',    name:'טרצה קטנה',    weight:3},
+  {semi:4, quality:'גדולה',  size:'טרצה',    name:'טרצה גדולה',   weight:3},
+  {semi:5, quality:'זכה',    size:'קוורטה',  name:'קוורטה זכה',   weight:3},
+  {semi:6, quality:'מוגדלת', size:'קוורטה',  name:'קוורטה מוגדלת',weight:2,altQ:'מוקטנת',altS:'קווינטה'},
+  {semi:7, quality:'זכה',    size:'קווינטה', name:'קווינטה זכה',  weight:3},
+  {semi:8, quality:'קטנה',   size:'סקסטה',   name:'סקסטה קטנה',   weight:3},
+  {semi:9, quality:'גדולה',  size:'סקסטה',   name:'סקסטה גדולה',  weight:3},
+  {semi:10,quality:'קטנה',   size:'ספטימה',  name:'ספטימה קטנה',  weight:3},
+  {semi:11,quality:'גדולה',  size:'ספטימה',  name:'ספטימה גדולה', weight:3},
+  {semi:12,quality:'זכה',    size:'אוקטבה',  name:'אוקטבה זכה',   weight:2},
+];
+const QUALITIES=['זכה','קטנה','גדולה','מוגדלת','מוקטנת'];
+const SIZES=['פרימה','סקונדה','טרצה','קוורטה','קווינטה','סקסטה','ספטימה','אוקטבה'];
+const SIZE_STEPS={פרימה:0,סקונדה:1,טרצה:2,קוורטה:3,קווינטה:4,סקסטה:5,ספטימה:6,אוקטבה:7};
+const LETTERS=['C','D','E','F','G','A','B'];
+const NAT_SEMI={C:0,D:2,E:4,F:5,G:7,A:9,B:11};
+
+// ── DIATONIC SPELLING ─────────────────────────────────────────────────────
+function noteToMidi(n){return 12*(n.octave+1)+NAT_SEMI[n.letter]+(n.acc==='#'?1:n.acc==='b'?-1:0);}
+function computeTopNote(root,interval){
+  const ri=LETTERS.indexOf(root.letter);
+  const steps=SIZE_STEPS[interval.size];
+  const ti=(ri+steps)%7,octAdd=Math.floor((ri+steps)/7);
+  const tL=LETTERS[ti],tO=root.octave+octAdd;
+  const topMidi=noteToMidi(root)+interval.semi;
+  const tNat=12*(tO+1)+NAT_SEMI[tL];
+  const diff=topMidi-tNat;
+  const acc=diff===1?'#':diff===-1?'b':diff===2?'##':diff===-2?'bb':'';
+  return {letter:tL,acc,octave:tO,midi:topMidi};
+}
+const ROOT_POOL=[
+  {letter:'C',acc:'',octave:4},{letter:'C',acc:'#',octave:4},
+  {letter:'D',acc:'b',octave:4},{letter:'D',acc:'',octave:4},
+  {letter:'E',acc:'b',octave:4},{letter:'E',acc:'',octave:4},
+  {letter:'F',acc:'',octave:4},{letter:'F',acc:'#',octave:4},
+  {letter:'G',acc:'',octave:4},{letter:'A',acc:'b',octave:4},
+  {letter:'A',acc:'',octave:4},{letter:'B',acc:'b',octave:4},
+  {letter:'B',acc:'',octave:4},
+];
+function accSym(a){return a==='#'?'♯':a==='b'?'♭':a==='##'?'𝄪':a==='bb'?'𝄫':'';}
+function noteDisplay(n){return n.letter+accSym(n.acc);}
+
+// ── TONE DISPLAY ──────────────────────────────────────────────────────────
+function toneText(s){
+  if(s===0) return '0 טונים';
+  if(s===1) return '½ טון';
+  if(s===2) return '1 טון';
+  if(s%2===0) return `${s/2} טונים`;
+  return `${Math.floor(s/2)}½ טונים`;
+}
+function namesCount(size){return SIZE_STEPS[size]+1;}
+
+// ── QUESTION GENERATION ───────────────────────────────────────────────────
+function rnd(arr){return arr[Math.floor(Math.random()*arr.length)];}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+function genQuestions(){
+  const required=INTERVALS.filter(iv=>iv.weight>1).map(iv=>({...iv}));
+  shuffle(required);
+  const pool=[];
+  INTERVALS.forEach(iv=>{for(let i=0;i<iv.weight;i++) pool.push(iv);});
+  const all=[...required];
+  while(all.length<20){const p=rnd(pool);if(all[all.length-1]?.name!==p.name) all.push(p);}
+  shuffle(all);
+  return all.slice(0,20).map((interval,i)=>{
+    let root,top,tries=0;
+    do{root=rnd(ROOT_POOL);top=computeTopNote(root,interval);tries++;}
+    while(tries<30&&(top.acc==='##'||top.acc==='bb'));
+    return{interval,root,top,type:i<10?'mc':'open'};
+  });
+}
+
+// ── STATE ─────────────────────────────────────────────────────────────────
+let QUESTIONS=genQuestions();
+let cur=0,score=0;
+const results=new Array(20).fill(null);
+const givenAns=new Array(20).fill(null);
+const flagged=new Set();
+const perf=Array.from({length:20},()=>({plays:0,startTime:0,timeMs:0}));
+let mcAttempts=0,openQ=null,openS=null;
+
+// ── AUDIO — piano-like sine ────────────────────────────────────────────────
+let audioCtx=null;
+function getCtx(){
+  if(!audioCtx||audioCtx.state==='closed') audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+  if(audioCtx.state==='suspended') audioCtx.resume();
+  return audioCtx;
+}
+function midiToFreq(m){return 440*Math.pow(2,(m-69)/12);}
+
+function playPianoNote(freq,t0,ctx,dest){
+  const harmonics=[1,2,3,4,5,6];
+  const amps=[1,0.5,0.25,0.12,0.06,0.03];
+  const mg=ctx.createGain();mg.gain.value=0.3;mg.connect(dest);
+  harmonics.forEach((h,i)=>{
+    const osc=ctx.createOscillator(),g=ctx.createGain();
+    osc.type='sine';osc.frequency.value=freq*h;
+    g.gain.setValueAtTime(0,t0);
+    g.gain.linearRampToValueAtTime(amps[i],t0+0.005);
+    g.gain.exponentialRampToValueAtTime(0.0001,t0+2.0);
+    osc.connect(g);g.connect(mg);
+    osc.start(t0);osc.stop(t0+2.1);
+  });
+}
+
+function playInterval(rootMidi,topMidi,btn){
+  perf[cur].plays++;
+  if(!perf[cur].startTime) perf[cur].startTime=Date.now();
+  const cntEl=document.getElementById('pc-'+cur);
+  if(cntEl) cntEl.textContent=perf[cur].plays>1?`הושמע ${perf[cur].plays} פעמים`:'';
+  const ctx=getCtx();
+  const now=ctx.currentTime+0.05;
+  playPianoNote(midiToFreq(rootMidi),now,ctx,ctx.destination);
+  playPianoNote(midiToFreq(topMidi),now+0.5,ctx,ctx.destination);
+  playPianoNote(midiToFreq(rootMidi),now+1.3,ctx,ctx.destination);
+  playPianoNote(midiToFreq(topMidi),now+1.3,ctx,ctx.destination);
+  if(btn){btn.classList.add('playing');setTimeout(()=>btn.classList.remove('playing'),(now+3.5-ctx.currentTime)*1000);}
+}
+
+// ── STAFF DRAWING ──────────────────────────────────────────────────────────
+const CLEF_B64='iVBORw0KGgoAAAANSUhEUgAAAJYAAAIcCAYAAAAUtVd1AAAaeElEQVR42u3dd9RcVb3G8W8aMGnwCy0ICQQIIDWhBaTIpRoRXBfRIEW5IN2CiIIgcOUCBlEuVfEiRcWFgg0EAWmRgEEgIdJLIKFIj79QEiek3T/ORt68mTPvlH3mnTnn+ayVxWLmzOyZc553n332nL03iIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiEgVfbQLmmdmY4GDgT2AkcAC4HbgHHd/TMGSegM1AjgPmJCyyfvAN939oqLtm36KR8Oh2hO4E9i6h/07vlQqlcrl8h0KlvQUqiOBa4GBNb5kx1Kp9H65XL5XwZK0UB0KXA70rfOlu5ZKpUfL5fKTamNJ91DtDdzYQKg+MAcY6+6zFCz5IFTrAQ8BKzX5VvcCO7v7Ep0KFarlQ0N97QhvNxJ4pVwuT83zPuur2NTkTGCziO93rpmtohqr2LXVOOCnkf8IVwBK5XL5FrWxihmq/sDDwKYZvP0CYGN3n6FTYfEck1GoAAYA31aNVbzaamXgWcAyLOZ9YJS7v6IaqzhOzzhUAMsBX1WNVZzaag3g+dDIztprwAh3X6gaK/9OalGoAIYDn9CpMP+11WrAkS0u9osKVv4dAZRaXOZ4M1tBwcpvbdU3BKvVBgG7Klj59Qni/B7YiH0VrPw6vBfLHp+nHanuhg9Pg4OAN3uhfdXVeu7+vGqsfBkfKVSTgK8BWwCrhPccDRwHPNPDa3fJy87srzz922eafP0U4BvuPqXCczOAGWZ2NfAzYP8qwbpSNVZ+ToP9mmjjLAHOBnZKCdW/ufs8kvGHaTf5ba82Vr6CtQ3wQIOhOsLdr6izvO2Bv6a830ru/o5qrHxotG1zTL2hCjXXFOD+lD/0MToVFjtYP3b3nzRR5o0pj2+pYOXHx+rcfipwfJNlpo2M3lzBykf7ahT1DelaCHzJ3d9vsugnUh5fT8HKh3rbNOe7+/RmC3X3ucDrFZ5aV8EqXrBmh66FWCrdkrxmGMeoYHW4egZLnBu5K2BuypXh2gpW56u1TfM6cEnksuemPL66gtX51qlxux+5+78il502YHgVBauzrwgNWLGGTecDl2XwEQYpWPlUa1vmV+7+RgblD1Gw8mmNGre7KqPyR6Y8PlTB6mwr17DNLOCeDE7Dw6oESN0NHW5YDdv8MqNJ0jao8txyClb+a6wbMip7myrPqcbq9AvDHp5/hWR6yFYHSzVWh+tpkOjNGc4VulOV5xYrWJ2tp5phUibVpNlGVO+YfV/Bynew7smo3J4mAVmgYHW2AVWem+nuL2dU7v49PK8aq8NVm9w3k+myzWwkPd+xOlfB6mzVJjv7e0ZlHkjPo6P+qWB1tgWtDJaZ9aG2+SFcweps1doyT2VQ3l7A+jVspxqrw6XdX7UYeCGD8o6rcbs3FazO9nbK469GGIXT/TS4MbB3jZu/qGB1tjkpj7+UQVmnUNuUBguAVxWsfAbrrci11brAATVu/g931086He7NVgQL+C61L4g1Mw87tujBejXrqzIz25yk76pWjytYne+VOq8WGzGxzv2sYOWkxqp0W0yUK0Iz24P6J3RTsDpd6FJ4LYtgmdkA4KI6X7YEeEzByocZKQe4WccDG9X5mqfd3RWsfHiuwmMDm6ytRpIsS1evKXnZqQpW5RprYJPveTkwWMEqtqdjBsvMDgP2bPDl9ypY+VGpsTy4wVCtA5zf4Od40d2fVLDy41mSST+6GtFAqPoD11LbJCOV3JannVr4YLn7Ipa992pUA291FrBdEx9Fwcqh6d1rrFAD1VpbfRb4VhPlzwduV7Dyp/to537UOMWRmY0Brqa5VT5uycNqFArWsh6s8NjWNYRqbeCmCN0T1+VthypYH54Kuw+s2LGHUK1OsgjAmk2W/S/gjwpWPhvw81l2VM4OVUK1RgjV+hGKv97d31Ow8qt75+TmZrZShVCNAiZT3zTe1fxfHnemgvWhyRUa8J/pFqodSX52ibUsyRPufp+CVaxgQZc7P83sK8BdxJ2D/cd53ZlaCHPpGulJlr7VZTHJPFbfBXaPXNxsYGRYdTV3tCb00u7sFqy+QFanqovzGiqdCpfVqt7vecRfPkXBamN3U30Gmpi11WwFqyDCzyoPZFzMHODcvO9LBWvpxvs44vVPpZmYl/vadVVYW6i2I7l1JcvlRl4CNsxgFTHVWG0aqu1bECqA44sQKtVYS4dqSMZF3eru44uyX4u+XuF2wK0tCFUZ+HKR9m3fAodqXItOfwCnuvtzClb+Q7VtC0N1D3BB0fZxnwKGaiuSn25WbEFx7wGbu/vMou3nvgUL1RiSn21WbFGRxxQxVIUKlpltRnLXp7WoyJ+4+zVFbcP2LUioNgqhWrlFRU4FvlbkK+4+BQjVeqEB/ZEWFfkGsK27v1DkYPXNeajWCg31VoWqDHy66KHKdbDMbJXQUF+7RUUuAQ519/uRfAbLzAaT9Khv1MJiT3L3XytSOQ1WmPvzt8BWLSz2bHc/T3HKabDCsm1X0vjEZ4242N2/oyjlu8Y6Bzi4heX9pOjdCrnvbjCzI2jtqOIL3f14RSjHwTKzPYGbad1wtu+5+ymKT46DFX6quZfW3KkASV/VEHdfqPjktI1lZquRTAE0tIXFrgBsoejkNFhmtjzwB1rXAdrV9opOfmusK1p4gBcpWAUIlpmdDBzUgqIWk6yJc6eClfNgmdlewNktKGouyQ/KF7LsUm+jwlSRkodghVtgrm3B5/4HsJO73xT+/3G1s3IaLDMbFBrrWd8B+igwzt0f7vKYgpXjGusSsp9XYTKws7v/o9vjT1TY9mOKT7qO6CA1swOBX2ZczI3ABHcvp3yGF1l6jZ0yMNTdFyhGHVhjmdn6wGUZF3MlsF9aqFJOhysAYxShDgyWmfUDriHbIfAXuvvhYbGmap5QOys/NdYJwLgM3//7ddyhoAZ8HoJlZhsCZ2ZYxFnuflId2ytYOamxfhraMVk4w91Pq/M1lU6Fa4flT6QTgmVmB9HDIklNmOjuddeE7v4u8KK6HTo0WGY2EJiY0dtf4u7fbuL1Oh12cI31TWCtjLoUvtrkeyhYnRissNrW1zN46xuAI919SQbB2srMllOU2rvG+jrxpxi6H/h8Df1UjTbglwfGKkptGiwzG0r8oVTPAvtEnKn4CZKh9DoddlCN9aXItdVsYLy7vxXrDcNKqLoy7JRgmVlf4s4qvBD4XEYTyqoB30E11qeBURHf7xvufldGn7VSsNYKUyZJmwXr2IjvdbW7X5ThZ3085XHVWl30+kKYZrYOsFukt3sEOCbjj5wWrEPMbDQwGtgAGE4y3nFoaPC/A7xLMuPfU+FC4O/A5Dwug9KnDYL1XeD0CG81F9ja3Z/K+PMOCgGJte/KwCSSGw1/GZa2U7CaPEh9gFnAyAhvd5i7X5Xx5y0BE0huPFw+gyLeI7lT9kJ3f1LBavxA7Ujl1ePr9St3/3yGn3MoyfjC42nNdN6LSO7uOMPdX1fjvX4TIrzHG2S0AJKZ9TGzw4HnSVayb9Uc8f2Ao4Bnzexo1Vj1HbS+JOP3hjf5Vvu7+28z+HwjgV8AO7fBcboRODxmZ2+ea6wdI4Tq+oxCtQ8wvU1CBbAvMN3MNlewevbJJl//LhlM02hm36A1A2PrtSYw2cx2VbCq+0STrz/L3V+NHKrzgR/QvrdsDwVuMbNPq41V+QCuEdpXjZb/LLCpu78f8TNdStxfALJUJvmBfZJqrKX9R5OhPjFyqL7XQaGCZJDJjWHtRQWri22beO2D7n5jxFB9GTi5A6/ohwA3hOkyFaygmb+00yOGajc6e1ndNYFrw4jxYgcr9F81eivvX9391kifY23g1ySdkZ1sV7Id2NsxNdYoYFCDrz0vYrh/QesWxszaSe3W3uqNYK3T4OtmkfRARzkQwE7kRz/g8nY6JfZGsBqdPvsSd18cobZaDziD/BlLG63r0ynBep9kwGkMF5LNLS/t4NRwJ0Yhg7VqA6/5k7t7hNpqF2DviN/lJZIVwOZ0e3xeaEeuHP6QdgYOBc4lWZ6lnNG+HUZya0+v641bkwc28JpY00TG6qq4I4TkTndfEk6vu3f7jqPc/XHgnyRDxiZ3CfgKJL+VTiAZSBKzBj3BzC5y9zlFq7HqvSJ8F7gpQm21LUmPfzOeAXZz9z3c/Y4uQ/anVdh2y7Q3cfeyu//O3SeEi5nvh+8Zw4rAF4p4KizVuf1dPcwNWqujmnz95cCYlGFldQWrW8heCxPAbUgyh30MRxYxWPUux9Z0h2gYANHo3aqLgGPd/cgqo2kqBauufiV3f9XdDwT2AZptT25iZjsULVhz69z+tghl7kVjnbILgQPc/cc9bDeDZHhXV2PCYBHqDNhNobab3uR3PkDBSveKu8+MUOY+DbxmCfAFd/9NDWFYUiEIQ0jGGNJAuGYBuwD3NfGd91aw0j0UqcxGGu3fdvd62jwNt7NSwvU2sCcwpcG3GGVmmyhYlU2N0L5ajfo7Za9393PrfE3T7awK4ZoXuiOeb/At9ixSsP5Zx7aPRCiv3lrjBeDwBsqJWmN1CdebJIMpGrky3qZIwarnr29WhPLWrXP7L4UZkuv1FEmPe1dRZvoLHa2nNPDSrRWs9NqjWfWcBn/v7nc0ePAXVahhzczWjbTfLiCZ9rIe65vZikUJVq2Toc2N8fsgsEodV4GnNllWJqfDLlee36zzZX0avTLtuGC5+1yglvkI3o5UZK2/Td4cYSKOqVkFK+y7e4Gb63zZyEIEK3imhm3mRSqr1qmyY9yWMy3LYAUXKljp7m9hsObX2AXypwhlPV6hvNjBugN4uo7t1yxSsO5tYVm19Jv91d3nN1tQWG31sW4Pr2pmIyKeDpeQDAKp1ZAiBes+Ks+XnsUOqWWGlmkRv1srTof13Ps/sDDBcvfZJP0+1QyOVNysGraZ0WHBmkYyL1gtSoUJVvCXFgWrltDMyThYW0X+w1wCPBj54iU3weppXqtSpM69qTWcdmOuRP8Iy95ztmUG+6/WYM0vWrDurqE63yDCX/ecFp52CXe7du8PW8PMhkfef48rWJUPwCLgN1kHK7ilh+dHRP56mZ8OSUYI1WJeoYIV/KpFwfp9D89/tAXBin06fLHG7d4sYrDu7eGqLdaqWveRTNaWZqcODFatv6O+XrhghaubC6pssoOZLR+pnEurbDLKzDaM+NWmA4uzDFZoy9Uy5cBrRayxIJkoP+2vr0S8xY+u6OGv96CIB/29CjXkSDNbJfK+q2UNnmcKGaxwt0O1UTB7RTzY1SYDOdrMYvZSt+J0OKCH5xcXNljBxVUuiw8O81nFqh3TfgBfFYi5CkSmt9CEdX166vyc2Vsri7VFsNz9tSq11lrAHhG7OA4h/YfpE8MB64Qaq5bO4ym9dUzbaT7z/65yaXxYxBDPAP6Lyr3xa5DMoxDDwxUe26rFwbqv8MEK4+jSbg3eL8zoEqus60kfnHCcme0ZoYw5LHt//7pmtlKkr1HL/pikGuvDK7dKp5D+RJwtORz4icD3KjzVB/hZWKQpi9Ph2Ehfoaf3eSbrRUE7JlhhKsgvU7l/5qDIfU24+ynA2RWeGg7cZmbDMghWrNNhT+21P/TmsWy7NWPcfQrJpGbd9SNZ5yZ2ed8hmbuze5g3Am5ucurFLBvwPQX0GgVrWacDD1R4/FNmdlAG4bqIZLRx95FB2wG3N9EuyiRYZjaW6uMlp7j7owrWsgd6IXAglWe5u8jMVs+gzJtJRg53D/S2wKRG7lsPw+Nf7vbwaDNr9jadA3t4/ke9fQzbtcbC3Z+j8sJJw4ArI3aadu+K2AE4jaXnStgCeMDMGvl5aVqFfd5wAz7MuVVtErnn6PmukeIGKxzoa4D/rfDUJ1Ma3VFqS3c/C9gYuI4P+7uGA/eY2RlmNqCJYDV7OtyP6vePnRVqfAWrBydS+Tbmk7Nob3UJ2Mww+ewWwNUkP/j2J+nInVTHXRfRgmVm/VO6SLqW9fN2OGh9OiBYH0xffRfL3ulQBj7p7ne34DOsFBr4mwHnufsbNb5uzQrtrMfdfdMGPsOxpN/+sxjY3t0fULDq26mrkPz2tX63p+YB+6TMZtwun/01oOsFxyJgSD0/EIcO22mkLyz1Q3c/sV2+c99OCZa7v0UySX/32WoGAjeFtQfbVfffDfuFU2ytoVo+NAfSQvUQjc2fpWCFcL1AsnxI91EwpRCuA9r0ozd7C82lpE+i9hYwIeZSxoULVgjXK8DHWXaSsxVIVhs9s5FpsDPW0E87ZtbHzC4gferKMrCvuz/fbsep44IVwvUmyXTVf6vw9GnAdWY2pM2DtWUNV4A/J32puPeBz4WfwNpOHzpYuFq8DPhihadnAoe4+31t8llnk3TufmABMLjSKczMPhK6OPaoUlPt5+63tOux6dvJwQqLHR0KfIVlh8mPAv5iZmeb2XJt8HG7N+AHhK6L7qE6iGQqpD2qtKn2audQdXywugTsEmA3lh2F0y9cLT1mZvu2czvLzDYxsxtI7kqwlPd4DNjW3e9p92OSi2CFcE0GNqfy72SjgRvM7HYzG9NO7Swz28zMrgMeJemATXMZMC7SEjBqYzXYnvkUyeCMtVI2+TPwA3e/vYWfaQOWneJxXugqqXYcXgKOdvc/ddIxyGWwwoEcQvK72lGkryT7SLjy+rW7v5zx5+lDcr9XrVer84HzSX5Untdp+z+3wepyQNcLXRAHhzZXJUtIRrTcCNwDTAvziTZT7rDQpbA1ydIj46htotmFIez/E1YB60i5D1aXAz06BOzAKgHreor6G8kcVDNIfkaaRbIm4VzgvXAVOghYjeQ2lvVIVkndOLT16r0xcG5ouJ8X7kXraIUJVpeAjSBZM/mL9NKqDRV8B7i0txcIV7DihWzHELB9WPrug1bby93/nKd9W+hgdQvZpsCu4d/HgZVaWHxb3fKiYGV7BTeCZEbBDcN/R5Ms+DS427/+ob21MFzJvROu/hx4leQmvxdI7sh4jGSwRvfBsI+4+xYKljQT2uuAz1a4Kl3D3V/Py/fsq0Pdcn9L+QPfPU9fUsFqj2ChYEmzprLsAgOECwYFSxoTBlA8VuGpUTFXCVOwdDrsahcFS5qRtg7OxxUsacYDCpZk4QkqT7C7vpmtqmBJow34RaSv6rqdgiVZtLPGKViSRbBUY0lTHkp5fJssJpVTsIrTzppB5bWoh9I+NyAqWB1qasrjYxUsySJYYxQsUY2lYLWdaaqxJAvPkdzK3N1qZraygiWNXhkuofLyc5AsuaJgScOmpzy+YSd/qf5FOoJm9lFgf2AnkhHLw8I+eJdkpPN04A7gxrBWdSvkssbqX5BAjSVZUSxtMrNh4d+WJKu5vmdmPwImurtn/PEeSXl8A50K2zdQ/czsbJLf5epZV3ow8C3gCTMbn/HHfILK98CvrWC1Z6hKwB9JZvTr1+DbDCeZ5vsrGTbg5wPPVHhqpILVfqFaDrgJGB9pH11kZkdn+JErDa4YFmH5OQUrsstJ5mCI6WIz2yXD02ElIxSs9qmtjiCZpiiLC51rIq5C39XTKY+vrmC1R6hGARdkWMSawJktDNbKClZ7uJhk0aYsHR1W4opppoLVvrXVzsDeLShqAHBc5CvDOSTTTypYbejUFpb1+Qzec3aFxwYpWL1bW61HfR2gzRphZptEfs9KfW3LK1i9awKtn0Qu9jCtgQpW+9m7F8pcP/L7DVKw2us0uBw1LCqZgdUifocVUkI0X8HqPaN76S87ZpmjUh6fq2D1nt76sXZOxPdaN+XxtxWs3tNbS/TOjlzrVjJLwSqemFNn75Dy+AwFq/e800vlxlzke6cKjy0EnlKwes8bvXQa/HukK8JNqXwXwzR3f0/B6j1PAotbXOYfw9CtGA5OefzuTj4oHR+sML11K08ZC4GzI9VWfasE6zcKVu9r5XrJV4QpiGLYj8qrrj7p7g8pWL3vdy1ssH89Ym2VdtPgZZ1+QHIRLHefQvrMLbE8DOwTTr0xHAp8tMLjr5Hcs69gtYlzM3rfRcBEYDt3j9IpGpY2OT/l6XMihrfX5Gq9QjObRLxJ+B34BXCZuz8Z8TMOAP5M5eVNHgS2D9N1d7S8DbE/lmTS2FIdtdEHK6K+TdLT/VD4d6+7lyMHvy/w85RQzQcOz0OocldjhYN3KHBVjZv/wd3/s0WfayBwBXBAyiaHuftVeTkO/fIWrHK5PL1UKq0IbF/D5huVSqWF5XJ5csah2hS4lfRBtBe6+8Q8HYfcBSuE67ZSqbQWyewxPdm1VCotyCJcZrZiqVQ6J9Sgw1M2uwI4rlwuo2B1gFKpdBPJ7b4fq2Hz3Uql0ualUmlSuVyeGylQJwDXhVoq7er7cuDIiD8PqY3VwjbXUcBFwHI1bP4u8EPgcnd/pYGG+Q7AgcAhVB+6tRg42d3Py+t+z32wwkEfC1xL7dMvLgQmA3eRzGw8g+Quirmhll85/FsT2IZkxM44ahtg+jpwqLvfmud9XohgdbkqOw04ocbaKwvXA8fE6mhVsNorYBsCZwGfaeH3nwac6O53F2U/Fy5YXQK2cai9JpBMDZmFu4ALiXv/loLVIQEbHGqvfYHdSVbfasbDwO+B69z96aLu18IHq1vIBgBbkAyAHUMy3m8EsCrJEPhSaNjPI5kd5mWSkTTPkPzOd7+7v6U9KSIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiKSP/8Pq3Mkvsx0bocAAAAASUVORK5CYII=';
+const TOP_Y=30,GAP=18,SVG_H=160,SVG_W=700;
+const BASE_POS={C:10,D:9,E:8,F:7,G:6,A:5,B:4};
+function staffPos(l,o){return BASE_POS[l]-(o-4)*7;}
+function posY(p){return TOP_Y+p*(GAP/2);}
+function mkL(p,x1,y1,x2,y2,s,w){
+  const ns='http://www.w3.org/2000/svg';
+  const l=document.createElementNS(ns,'line');
+  [['x1',x1],['y1',y1],['x2',x2],['y2',y2],['stroke',s],['stroke-width',w]].forEach(([a,v])=>l.setAttribute(a,String(v)));
+  p.appendChild(l);
+}
+function drawStaff(svgEl,rootNote,topNote){
+  const ns='http://www.w3.org/2000/svg';
+  svgEl.setAttribute('viewBox',`0 -20 ${SVG_W} ${SVG_H+20}`);
+  svgEl.setAttribute('preserveAspectRatio','xMinYMid meet');
+  svgEl.innerHTML='';
+  for(let i=0;i<5;i++) mkL(svgEl,0,TOP_Y+i*GAP,SVG_W,TOP_Y+i*GAP,'#2a2a2a',1.1);
+  mkL(svgEl,0.5,TOP_Y,0.5,TOP_Y+4*GAP,'#2a2a2a',2);
+  mkL(svgEl,SVG_W-0.5,TOP_Y,SVG_W-0.5,TOP_Y+4*GAP,'#2a2a2a',2);
+  const clef=document.createElementNS(ns,'image');
+  clef.setAttribute('x','0');clef.setAttribute('y','-24');
+  clef.setAttribute('width','50');clef.setAttribute('height',String(SVG_H+20));
+  clef.setAttribute('preserveAspectRatio','xMinYMin meet');
+  const src='data:image/png;base64,'+CLEF_B64;
+  clef.setAttribute('href',src);
+  clef.setAttributeNS('http://www.w3.org/1999/xlink','href',src);
+  svgEl.appendChild(clef);
+  [[rootNote,'#1d4ed8'],[topNote,'#7c3aed']].forEach(([note,color],ni)=>{
+    const pos=staffPos(note.letter,note.octave);
+    const nx=ni===0?180:340;
+    const ny=posY(pos);
+    const WX=10,WY=7;
+    for(let lp=10;lp<=pos;lp+=2) mkL(svgEl,nx-WX-6,posY(lp),nx+WX+6,posY(lp),'#2a2a2a',1.3);
+    for(let lp=-2;lp>=pos;lp-=2) mkL(svgEl,nx-WX-6,posY(lp),nx+WX+6,posY(lp),'#2a2a2a',1.3);
+    if(note.acc){
+      const sym=note.acc==='#'?'♯':note.acc==='b'?'♭':note.acc==='##'?'𝄪':'𝄫';
+      const at=document.createElementNS(ns,'text');
+      at.setAttribute('x',String(nx-WX-13));at.setAttribute('y',String(ny+5));
+      at.setAttribute('font-size','16');at.setAttribute('font-family',"'Times New Roman',serif");
+      at.setAttribute('fill',color);at.setAttribute('text-anchor','middle');
+      at.textContent=sym;svgEl.appendChild(at);
+    }
+    const e=document.createElementNS(ns,'ellipse');
+    e.setAttribute('cx',String(nx));e.setAttribute('cy',String(ny));
+    e.setAttribute('rx','10');e.setAttribute('ry','7');
+    e.setAttribute('fill','#fff');e.setAttribute('stroke',color);e.setAttribute('stroke-width','2.2');
+    e.setAttribute('transform',`rotate(-16,${nx},${ny})`);svgEl.appendChild(e);
+    const hole=document.createElementNS(ns,'ellipse');
+    hole.setAttribute('cx',String(nx));hole.setAttribute('cy',String(ny));
+    hole.setAttribute('rx','6.5');hole.setAttribute('ry','4.5');
+    hole.setAttribute('fill','#fff');hole.setAttribute('transform',`rotate(20,${nx},${ny})`);
+    svgEl.appendChild(hole);
+    const lbl=document.createElementNS(ns,'text');
+    const lblY=pos>=9?ny-13:ny+22;
+    lbl.setAttribute('x',String(nx));lbl.setAttribute('y',String(lblY));
+    lbl.setAttribute('text-anchor','middle');lbl.setAttribute('font-size','12');
+    lbl.setAttribute('fill',color);lbl.setAttribute('font-family','monospace');
+    lbl.textContent=note.letter+accSym(note.acc)+note.octave;
+    svgEl.appendChild(lbl);
+  });
+  const p0={x:180,y:posY(staffPos(rootNote.letter,rootNote.octave))};
+  const p1={x:340,y:posY(staffPos(topNote.letter,topNote.octave))};
+  mkL(svgEl,p0.x,p0.y,p1.x,p1.y,'#cbd5e1',1.5);
+}
+
+// ── MC WRONG OPTIONS ──────────────────────────────────────────────────────
+function genMCOptions(correct){
+  const others=INTERVALS.filter(i=>i.name!==correct.name);
+  shuffle(others);
+  return shuffle([correct,others[0],others[1],others[2]]);
+}
+
+// ── FEEDBACK HTML ─────────────────────────────────────────────────────────
+function buildFbHTML(res,c,q){
+  const prefix=res==='ok'?`✓ נכון! <b>${c.name}</b>`:res==='partial'?`½ חלקי — תשובה נכונה: <b>${c.name}</b>`:`✗ תשובה נכונה: <b>${c.name}</b>`;
+  const nc=namesCount(c.size);
+  const rD=noteDisplay(q.root),tD=noteDisplay(q.top);
+  const tones=toneText(c.semi);
+  return `${prefix}<div class="iv-chips">
+    <span class="iv-chip" style="direction:ltr;unicode-bidi:embed">${rD} &lt;--&gt; ${tD}</span>
+    <span class="iv-chip">${nc} שמות צלילים</span>
+    <span class="iv-chip tone-chip">${tones}</span>
+  </div>`;
+}
+
+// ── RENDER ────────────────────────────────────────────────────────────────
+function render(targetQ){
+  if(targetQ!==undefined) cur=targetQ;
+  if(cur>=20){renderScore();return;}
+
+  // Change palette per question
+  curPalette=cur%PALETTES.length;
+  applyPalette(curPalette);
+
+  const q=QUESTIONS[cur];
+  document.getElementById('q-counter').textContent=`שאלה ${cur+1} / 20`;
+  document.getElementById('prog').style.width=`${(cur/20)*100}%`;
+  mcAttempts=0;openQ=null;openS=null;
+  if(!perf[cur].startTime) perf[cur].startTime=Date.now();
+
+  const main=document.getElementById('main');
+  main.innerHTML='';
+
+  const badge=document.createElement('div');
+  badge.className='badge';
+  badge.innerHTML=q.type==='mc'?'🎯 שאלה אמריקאית':'👂 שאלה פתוחה';
+  main.appendChild(badge);
+
+  const card=document.createElement('div');card.className='card';
+
+  // Flag
+  const fb2=document.createElement('button');fb2.className='flag-btn'+(flagged.has(cur)?' active':'');
+  fb2.innerHTML=flagged.has(cur)?'🚩':'⚑';fb2.title='סמנו לחזרה';
+  fb2.onclick=()=>{
+    if(flagged.has(cur)){flagged.delete(cur);fb2.innerHTML='⚑';fb2.classList.remove('active');}
+    else{flagged.add(cur);fb2.innerHTML='🚩';fb2.classList.add('active');}
+    updateNav();
+  };
+  card.appendChild(fb2);
+
+  // Play
+  const pb=document.createElement('button');pb.className='play-big';pb.innerHTML='▶';
+  pb.onclick=()=>playInterval(noteToMidi(q.root),q.top.midi,pb);
+  card.appendChild(pb);
+  card.insertAdjacentHTML('beforeend',`<div class="play-hint">לחצו כמה פעמים · חמשה תוצג רק לאחר תשובה</div><div class="play-count" id="pc-${cur}"></div>`);
+
+  if(results[cur]!==null){
+    // Revisiting answered question
+    const infoDiv=document.createElement('div');
+    infoDiv.style.cssText='padding:9px;background:var(--accent-l);border-radius:8px;font-size:.85rem;text-align:right;margin-top:8px';
+    const r=results[cur];
+    infoDiv.innerHTML=`<b>תשובתך:</b> ${givenAns[cur]?.given} <span style="margin-right:8px;font-size:.8rem;color:${r==='ok'?'var(--green)':r==='partial'?'var(--accent)':'var(--red)'}">${r==='ok'?'✓ נכון':r==='partial'?'½ חלקי':'✗ שגוי'}</span>`;
+    card.appendChild(infoDiv);
+  } else {
+    if(q.type==='mc') buildMC(card,q);
+    else buildOpen(card,q);
+  }
+
+  const fb=document.createElement('div');fb.className='fb';fb.id='fb';card.appendChild(fb);
+  const sr=document.createElement('div');sr.className='staff-reveal';sr.id='sr';
+  const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  svg.setAttribute('class','staff-svg');sr.appendChild(svg);card.appendChild(sr);
+  const nb=document.createElement('button');nb.className='next-btn';nb.id='nb';
+  nb.textContent=cur<19?'שאלה הבאה ›':'סיום ›';
+  nb.onclick=()=>{cur++;render();};
+  card.appendChild(nb);
+  main.appendChild(card);
+
+  if(results[cur]!==null){
+    const fbEl=document.getElementById('fb'),srEl=document.getElementById('sr'),svgEl=srEl?.querySelector('svg'),nbEl=document.getElementById('nb');
+    const res=results[cur],c=q.interval;
+    fbEl.className='fb '+(res==='ok'?'ok':res==='partial'?'partial':'err');
+    fbEl.innerHTML=buildFbHTML(res,c,q);
+    srEl?.classList.add('show');if(svgEl) drawStaff(svgEl,q.root,q.top);
+    nbEl?.classList.add('show');
+  }
+  updateNav();
+  main.scrollTop=0;
+}
+
+// ── MC ────────────────────────────────────────────────────────────────────
+function buildMC(card,q){
+  const opts=genMCOptions(q.interval);
+  const grid=document.createElement('div');grid.className='mc-grid';
+  opts.forEach(opt=>{
+    const b=document.createElement('button');b.className='mc-btn';b.textContent=opt.name;
+    b.onclick=()=>checkMC(b,opt,q,grid);
+    grid.appendChild(b);
+  });
+  card.appendChild(grid);
+}
+function isPartialMC(chosen,c){
+  return (chosen.size===c.size&&chosen.quality!==c.quality)||
+         (chosen.quality===c.quality&&chosen.size!==c.size);
+}
+function checkMC(btn,chosen,q,grid){
+  const c=q.interval;
+  const isOk=chosen.name===c.name||(c.altQ&&chosen.quality===c.altQ&&chosen.size===c.altS);
+  const isPartial=!isOk&&isPartialMC(chosen,c);
+  if(isOk){
+    grid.querySelectorAll('.mc-btn').forEach(b=>{b.disabled=true;if(b.textContent===c.name) b.classList.add('correct');});
+    recordResult('ok',q,chosen.name);showFb('ok',q);
+  } else if(isPartial){
+    grid.querySelectorAll('.mc-btn').forEach(b=>{
+      b.disabled=true;
+      if(b.textContent===c.name) b.classList.add('correct');
+      else if(b===btn) b.classList.add('partial');
+    });
+    recordResult('partial',q,chosen.name);showFb('partial',q);
+  } else {
+    mcAttempts++;
+    btn.classList.add('wrong');
+    if(mcAttempts<2){setTimeout(()=>btn.classList.remove('wrong'),700);}
+    else{
+      grid.querySelectorAll('.mc-btn').forEach(b=>{b.disabled=true;if(b.textContent===c.name) b.classList.add('correct');else if(b===btn) b.classList.remove('wrong');});
+      recordResult('err',q,chosen.name);showFb('err',q);
+    }
+  }
+}
+
+// ── OPEN ──────────────────────────────────────────────────────────────────
+function buildOpen(card,q){
+  const disp=document.createElement('div');disp.className='sel-display';disp.id='disp';
+  disp.innerHTML='<span style="color:var(--gray)">בחרו סוג ומספר</span>';
+  card.appendChild(disp);
+  const wrap=document.createElement('div');wrap.className='panels-wrap';
+  const qLbl=document.createElement('div');qLbl.className='panel-label';qLbl.textContent='סוג המרווח:';
+  const qRow=document.createElement('div');qRow.className='panel-btns';qRow.id='qrow';
+  QUALITIES.forEach(ql=>{
+    const b=document.createElement('button');b.className='panel-btn';b.textContent=ql;
+    b.onclick=()=>{qRow.querySelectorAll('.panel-btn').forEach(x=>x.classList.remove('sel-q'));b.classList.add('sel-q');openQ=ql;updDisp();};
+    qRow.appendChild(b);
+  });
+  wrap.appendChild(qLbl);wrap.appendChild(qRow);
+  const sLbl=document.createElement('div');sLbl.className='panel-label';sLbl.textContent='מספר המרווח:';
+  const sRow=document.createElement('div');sRow.className='panel-btns';sRow.id='srow';
+  SIZES.forEach(sz=>{
+    const b=document.createElement('button');b.className='panel-btn';b.textContent=sz;
+    b.onclick=()=>{sRow.querySelectorAll('.panel-btn').forEach(x=>x.classList.remove('sel-s'));b.classList.add('sel-s');openS=sz;updDisp();};
+    sRow.appendChild(b);
+  });
+  wrap.appendChild(sLbl);wrap.appendChild(sRow);
+  card.appendChild(wrap);
+  const actRow=document.createElement('div');actRow.className='submit-row';
+  const clrBtn=document.createElement('button');clrBtn.className='clear-btn';clrBtn.textContent='✕ בטל בחירה';
+  clrBtn.onclick=()=>{
+    openQ=null;openS=null;
+    document.querySelectorAll('#qrow .panel-btn,#srow .panel-btn').forEach(b=>b.classList.remove('sel-q','sel-s'));
+    const d=document.getElementById('disp');if(d) d.innerHTML='<span style="color:var(--gray)">בחרו סוג ומספר</span>';
+    const s=document.getElementById('sub');if(s) s.disabled=true;
+  };
+  const sub=document.createElement('button');sub.className='submit-btn';sub.id='sub';sub.textContent='בדקו תשובה';sub.disabled=true;
+  sub.onclick=()=>checkOpen(q);
+  actRow.appendChild(clrBtn);actRow.appendChild(sub);
+  card.appendChild(actRow);
+}
+function updDisp(){
+  const el=document.getElementById('disp'),sub=document.getElementById('sub');
+  if(!el) return;
+  if(openQ&&openS){el.innerHTML=`<span class="sel-s">${openS}</span> <span class="sel-q">${openQ}</span>`;if(sub)sub.disabled=false;}
+  else if(openQ) el.innerHTML=`<span class="sel-q">${openQ}</span><span style="color:var(--gray)"> — בחרו מספר</span>`;
+  else if(openS) el.innerHTML=`<span class="sel-s">${openS}</span><span style="color:var(--gray)"> — בחרו סוג</span>`;
+}
+function checkOpen(q){
+  const c=q.interval;
+  const sameQ=openQ===c.quality||(c.altQ&&openQ===c.altQ);
+  const sameS=openS===c.size||(c.altS&&openS===c.altS);
+  const isOk=sameQ&&sameS;
+  const isPartial=!isOk&&(sameQ||sameS);
+  const res=isOk?'ok':isPartial?'partial':'err';
+  ['qrow','srow'].forEach(id=>{
+    document.getElementById(id)?.querySelectorAll('.panel-btn').forEach(b=>{
+      b.disabled=true;
+      const isQ=id==='qrow';
+      const correctVal=isQ?(c.altQ?[c.quality,c.altQ]:[c.quality]):(c.altS?[c.size,c.altS]:[c.size]);
+      const selVal=isQ?openQ:openS;
+      if(correctVal.includes(b.textContent)) b.classList.add('correct');
+      else if(b.textContent===selVal){
+        const selOk=isQ?sameQ:sameS;
+        b.classList.add(selOk&&!isOk?'partial':'wrong');
+      }
+      b.classList.remove('sel-q','sel-s');
+    });
+  });
+  document.getElementById('sub')&&(document.getElementById('sub').disabled=true);
+  recordResult(res,q,`${openS} ${openQ}`);
+  showFb(res,q);
+}
+
+function recordResult(res,q,given){
+  perf[cur].timeMs=Date.now()-perf[cur].startTime;
+  results[cur]=res;
+  givenAns[cur]={correct:q.interval.name,given,isOk:res==='ok',isPartial:res==='partial'};
+  if(res==='ok') score++;else if(res==='partial') score+=0.5;
+  updateNav();
+}
+function showFb(res,q){
+  const fb=document.getElementById('fb'),sr=document.getElementById('sr'),nb=document.getElementById('nb');
+  const svg=sr?.querySelector('svg');
+  fb.className='fb '+(res==='ok'?'ok':res==='partial'?'partial':'err');
+  fb.innerHTML=buildFbHTML(res,q.interval,q);
+  if(sr){sr.classList.add('show');if(svg) drawStaff(svg,q.root,q.top);}
+  if(nb) nb.classList.add('show');
+}
+
+// ── NAV ───────────────────────────────────────────────────────────────────
+function updateNav(){
+  const wrap=document.getElementById('nav-dots');if(!wrap) return;
+  wrap.innerHTML='';
+  QUESTIONS.forEach((_,i)=>{
+    if(i===10){const d=document.createElement('div');d.className='section-divider';wrap.appendChild(d);}
+    const d=document.createElement('div');
+    const rc=results[i];
+    d.className='ndot'+(i===cur?' cur':'')+(rc==='ok'?' done-ok':rc==='err'?' done-err':rc==='partial'?' done-partial':'')+(flagged.has(i)?' flagged':'');
+    d.textContent=String(i+1);d.title=`שאלה ${i+1}${flagged.has(i)?' 🚩':''}`;
+    d.onclick=()=>render(i);
+    wrap.appendChild(d);
+  });
+}
+
+// ── SCORE ─────────────────────────────────────────────────────────────────
+function renderScore(){
+  document.getElementById('q-counter').textContent='סיום!';
+  document.getElementById('prog').style.width='100%';
+  applyPalette(0); // reset to blue for score
+  updateNav();
+
+  const totalScore=Math.round(score*10)/10;
+  const pct=Math.round(totalScore/20*100);
+
+  // Per-interval analysis
+  const ivStats={};
+  QUESTIONS.forEach((q,i)=>{
+    const name=q.interval.name;
+    if(!ivStats[name]) ivStats[name]={name,total:0,ok:0,totalTime:0,totalPlays:0};
+    ivStats[name].total++;
+    if(results[i]==='ok') ivStats[name].ok++;
+    else if(results[i]==='partial') ivStats[name].ok+=0.5;
+    ivStats[name].totalTime+=perf[i].timeMs;
+    ivStats[name].totalPlays+=perf[i].plays;
+  });
+  const vals=Object.values(ivStats);
+  const avgTime=vals.reduce((a,s)=>a+s.totalTime/s.total,0)/vals.length||1;
+  const avgPlays=vals.reduce((a,s)=>a+s.totalPlays/s.total,0)/vals.length||1;
+
+  const strong=vals.filter(s=>s.ok===s.total&&s.totalPlays/s.total<=avgPlays*1.2&&s.totalTime/s.total<=avgTime*1.2);
+  const needWork=vals.filter(s=>s.ok<s.total||s.totalPlays/s.total>avgPlays*1.5||s.totalTime/s.total>avgTime*1.4)
+    .sort((a,b)=>a.ok/a.total-b.ok/b.total);
+
+  let analysisHTML='';
+  if(strong.length) analysisHTML+=`<div class="analysis-title" style="color:var(--green)">💪 חוזקות:</div>${strong.map(s=>`<span class="tag tag-ok">${s.name}</span>`).join('')}`;
+  if(needWork.length){
+    analysisHTML+=`<div class="analysis-title" style="color:var(--red);margin-top:10px">📚 לשיפור:</div>`;
+    analysisHTML+=needWork.map(s=>{
+      const extra=[];
+      if(s.totalPlays/s.total>avgPlays*1.5) extra.push(`${(s.totalPlays/s.total).toFixed(1)} השמעות ממוצע`);
+      const sub=extra.length?` <small>(${extra.join(', ')})</small>`:'';
+      return `<span class="tag tag-err">${s.name} ${s.ok}/${s.total}${sub}</span>`;
+    }).join('');
+  }
+
+  let tableHTML=`<table class="analysis-table"><thead><tr><th>#</th><th>מרווח נכון</th><th>תשובתך</th><th></th></tr></thead><tbody>`;
+  givenAns.forEach((g,i)=>{
+    if(!g) return;
+    tableHTML+=`<tr><td>${i+1}</td><td>${g.correct}</td><td>${g.given}</td><td><span class="tag ${g.isOk?'tag-ok':g.isPartial?'tag-warn':'tag-err'}">${g.isOk?'✓':g.isPartial?'½':'✗'}</span></td></tr>`;
+  });
+  tableHTML+='</tbody></table>';
+
+  const studentName=(document.getElementById('student-name')?.value||'').trim();
+  const studentClass=(document.getElementById('student-class')?.value||'').trim();
+  const nameLabel=studentName||'תלמיד/ה';
+
+  const msgHTML=pct>=90
+    ?`<div class="msg-box msg-great">🌟 עבודה מעולה! מתן מבסוט עליכן.ם! יאללה תורידו את התוצאה ותשוויצו לו בקלסרום 💪🏻</div>`
+    :pct<70
+    ?`<div class="msg-box msg-retry">עבודה טובה ${nameLabel}. בואו ניתן סיבוב נוסף ונשפר את הציון 👌🏻🍃</div>`
+    :`<div class="msg-box msg-ok">כל הכבוד ${nameLabel}! עבודה יפה 🎵</div>`;
+
+  const main=document.getElementById('main');
+  main.innerHTML=`
+  <div class="score-card">
+    <div class="print-header">מבחן שמיעה — מרווחים מוזיקליים | ${studentName?studentName+' | ':''}${studentClass?'כיתה '+studentClass+' | ':''}סיכום תוצאות</div>
+    <div style="font-size:1.05rem;font-weight:700;color:var(--accent);margin-bottom:8px">🎵 סיום המבחן</div>
+    <div class="score-big">${totalScore}<span style="font-size:1.3rem;color:var(--gray)">/20</span></div>
+    <div style="font-size:.85rem;color:var(--gray);margin-top:4px">${pct}% — ${pct>=90?'מצוין! 🏆':pct>=70?'טוב מאוד 👍':pct>=50?'טוב, המשיכו':'המשיכו להתאמן 💪'}</div>
+    <div class="score-bar"><div class="score-fill" style="width:0%" id="sb"></div></div>
+    <div style="font-size:.77rem;color:var(--gray)">שאלות אמריקאיות: ${givenAns.slice(0,10).filter(g=>g?.isOk).length}/10 &nbsp;·&nbsp; שאלות פתוחות: ${givenAns.slice(10).filter(g=>g?.isOk).length}/10</div>
+    ${msgHTML}
+    <div class="analysis-section">${analysisHTML}</div>
+    ${tableHTML}
+    <button class="pdf-btn" onclick="window.print()">📄 הורידו דוח PDF</button>
+    <div style="font-size:.72rem;color:var(--gray);text-align:center;margin-top:5px">הורידו את הקובץ והגישו למתן בקלסרום</div>
+    <button class="restart-btn" onclick="restartExam()">נסו שוב</button>
+  </div>`;
+  setTimeout(()=>{const sb=document.getElementById('sb');if(sb)sb.style.width=pct+'%';},100);
+}
+
+function restartExam(){
+  cur=0;score=0;results.fill(null);givenAns.fill(null);flagged.clear();
+  mcAttempts=0;openQ=null;openS=null;
+  perf.forEach(p=>{p.plays=0;p.startTime=0;p.timeMs=0;});
+  QUESTIONS=genQuestions();
+  render();
+}
+
+render();
+</script>
+</body>
+</html>
